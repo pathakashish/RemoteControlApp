@@ -3,8 +3,12 @@ package com.ashish.remotecontrolapp.services
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityManager
 
-class MyAccessibilityService : AccessibilityService() {
+class MyAccessibilityService : AccessibilityService(),
+    AccessibilityManager.TouchExplorationStateChangeListener {
+
+    private lateinit var accessibilityManager: AccessibilityManager
 
     /**
      * This system calls this method when it successfully connects to your accessibility service.
@@ -15,6 +19,19 @@ class MyAccessibilityService : AccessibilityService() {
      */
     override fun onServiceConnected() {
         super.onServiceConnected()
+        initAccessibilityManager()
+        initTouchExplorationCapability()
+    }
+
+    private fun initTouchExplorationCapability() {
+        accessibilityManager.addTouchExplorationStateChangeListener(this)
+        if (accessibilityManager.isTouchExplorationEnabled) {
+            requestTouchExploration()
+        }
+    }
+
+    private fun initAccessibilityManager() {
+        accessibilityManager = getSystemService(ACCESSIBILITY_SERVICE) as AccessibilityManager
     }
 
     /**
@@ -44,5 +61,15 @@ class MyAccessibilityService : AccessibilityService() {
      */
     override fun onUnbind(intent: Intent?): Boolean {
         return super.onUnbind(intent)
+    }
+
+    override fun onTouchExplorationStateChanged(enabled: Boolean) {
+        if (!enabled) {
+            requestTouchExploration()
+        }
+    }
+
+    private fun requestTouchExploration() {
+        // Start an Intent to enable this service and touch exploration
     }
 }
