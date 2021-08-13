@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">RemoteControlApp</string>
+    <string name="accessibility_service_label">Remote assistance service</string>
+    <string name="accessibility_service_description">This service helps user by letting a remote tech support  control the device for common troubleshooting steps.</string>
 </resources>
