@@ -2,8 +2,13 @@ package com.ashish.remotecontrolapp.services
 
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
+import android.view.accessibility.AccessibilityNodeInfo
+
+
+const val TAG = "MyAccessibilityService"
 
 class MyAccessibilityService : AccessibilityService(),
     AccessibilityManager.TouchExplorationStateChangeListener {
@@ -44,7 +49,28 @@ class MyAccessibilityService : AccessibilityService(),
      * service.
      */
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        when (event?.eventType) {
+            AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED -> {
+                logNodeHierarchy(rootInActiveWindow, 0)
+            }
+        }
+    }
 
+    private fun logNodeHierarchy(nodeInfo: AccessibilityNodeInfo?, depth: Int) {
+        if (nodeInfo == null) return
+        if("ALLOW".equals(nodeInfo.text?.toString(), true)) {
+            Log.v(TAG, "Clicking ALLOW button")
+            nodeInfo.performAction(AccessibilityNodeInfo.ACTION_CLICK)
+        }
+        var logString = ""
+        for (i in 0 until depth) {
+            logString += " "
+        }
+        logString += "Text: ${nodeInfo.text} Content-Description: ${nodeInfo.contentDescription}"
+        Log.v(TAG, logString)
+        for (i in 0 until nodeInfo.childCount) {
+            logNodeHierarchy(nodeInfo.getChild(i), depth + 1)
+        }
     }
 
     /**
